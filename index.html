@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>舉重比賽流程模擬 — 多人 TO 角色扮演</title>
+<title>舉重比賽模擬 — 多人 TO 角色扮演</title>
 <style>
   :root{ --bg:#0f1226; --card:#222a52; --ink:#f4f6ff; --muted:#9aa3c7; --line:#343d6b;
     --accent:#ffd23f; --good:#2ec27e; --bad:#ff5d5d; --blue:#1469c7; }
@@ -53,6 +53,13 @@
   .liftphase.ready{background:#15407a55; color:#cfe0ff}
   .liftphase.lifting{background:#7a120c66; color:#ffb3ad; animation:cb .5s steps(2) infinite}
   .liftphase.done{background:#5a4a1366; color:#ffe6a0}
+  .control{text-align:center; font-weight:800; border-radius:12px; padding:12px; margin:6px 0;
+    background:#7a120c88; color:#ffd0cc; border:2px solid var(--bad); animation:cb .7s steps(2) infinite}
+  body.projector .control{font-size:1.6rem; padding:16px}
+  .equip{text-align:center; font-weight:800; border-radius:12px; padding:12px; margin:6px 0;
+    background:#15407a66; color:#cfe0ff; border:1px solid var(--line)}
+  .equip.bad{background:#5a3a0c88; color:#ffe2b0; border-color:#c98b22}
+  body.projector .equip{font-size:1.7rem; padding:18px}
   .btns{display:flex; gap:10px; flex-wrap:wrap} .btns>*{flex:1; min-width:120px}
 
   table{width:100%; border-collapse:collapse; font-size:.92rem}
@@ -114,7 +121,7 @@
 
   <!-- 選角色 -->
   <section id="pick" class="card">
-    <h1>🏋️ 舉重比賽流程模擬</h1>
+    <h1>🏋️ 舉重比賽模擬 TO 角色扮演</h1>
     <p class="sub">男子 65 kg A 組 抓舉比賽（3 位選手 · 9 次試舉）</p>
     <div class="roles">
       <button onclick="join('announcer')">🎙️ 播報 Announcer</button>
@@ -125,12 +132,14 @@
       <button onclick="join('ref3')">🚦 裁判③ Referee 3</button>
       <button onclick="join('jury')">🧑‍⚖️ 審判 Jury</button>
       <button onclick="join('director')">🎬 情境控制（台上動作）</button>
+      <button onclick="join('equip')">👕 裝備控制（選手服裝）</button>
+      <button onclick="join('control')">🔧 技術管制員 Technical Controller</button>
       <button class="b-ghost" style="grid-column:1/-1" onclick="join('board')">📺 大螢幕（投影）</button>
     </div>
     <div class="err" id="pickErr"></div>
     <div class="center" style="margin-top:16px">
       <div class="qr"><img id="qrImg" alt="QR" width="180" height="180"></div>
-      <p class="sub" style="margin-top:8px">📱 學員用手機掃描 QR 進入，各自選一個角色<br>網站版權 JC 所有</p>
+      <p class="sub" style="margin-top:8px">📱 學員用手機掃描 QR 進入，選一個角色<br>網站版權 JC 所有</p>
     </div>
   </section>
 
@@ -151,6 +160,8 @@
       <div class="clock" id="clock">1:00</div>
     </div>
     <div class="cue" id="cue"></div>
+    <div class="equip hidden" id="equipMsg"></div>
+    <div class="control hidden" id="controlMsg"></div>
     <div class="liftphase" id="liftPhase" style="display:none"></div>
     <div class="down hidden" id="down">⬇️ 放下 DOWN</div>
     <div class="lights" id="lights"></div>
@@ -228,13 +239,25 @@ let lastDecided = false;
 // ★★ 事先建立好的「完成動作」情境選項 —— 要增減/修改就改這個清單即可 ★★
 //    label = 按鈕文字；desc = 投影給裁判判讀的動作描述
 const LIFT_SCENARIOS = [
-  {label:"✅ 標準成功",  desc:"動作標準、一次到定位、穩定鎖定、等到放下信號"},
-  {label:"⚠️ Press-out", desc:"蹲底後手臂繼續推直完成（press-out 推舉）"},
-  {label:"⚠️ 手肘觸膝",  desc:"上膊過程手肘/上臂觸碰膝蓋或大腿"},
-  {label:"⚠️ 未等 Down", desc:"鎖定後未等放下信號就拋槓"},
-  {label:"⚠️ 未固定",    desc:"過頭後身體/手臂未固定、明顯晃動未靜止"},
-  {label:"⚠️ 觸地",      desc:"膝蓋或身體（非雙腳）觸碰舉重台"},
-  {label:"⚠️ 放下時摔槓", desc:"鎖定得白燈後，從頭頂直接摔下槓鈴（未受控放下）→ 裁判可在 3 秒內改判 No-lift"},
+  {label:"✅ 標準成功",  desc:"動作標準、一次到位"},
+  {label:"⚠️ 二次推", desc:"手臂二次推（press-out）"},
+  {label:"⚠️ 二次發力", desc:"槓鈴在上升過程中停頓"},
+  {label:"⚠️ 槓鈴離地又放下", desc:"槓鈴離地未過膝、又放回地面"},
+  {label:"⚠️ 手肘碰膝",  desc:"過程手肘觸碰膝蓋或大腿"},
+  {label:"⚠️ 成功，但搶信號", desc:"動作標準、但未等信號就放下"},
+  {label:"⚠️ 尚未靜止",    desc:"身體/手臂未固定、明顯晃動尚未靜止"},
+  {label:"⚠️ 身體觸地",    desc:"膝蓋或身體（非雙腳）觸碰舉重台"},
+  {label:"⚠️ 成功，肩上丟槓", desc:"得白燈後，從肩上直接摔下槓鈴"},
+  {label:"⚠️ 成功，槓鈴落在台下",  desc:"得白燈後，槓鈴掉落到舉重台以外的地方"},
+];
+// ★★ 裝備控制：選手裝備/服裝情境（可自行增減；呈現在大螢幕給技術管制判定）★★
+const EQUIP_ISSUES = [
+  "手肘 10cm 內貼有貼布",
+  "上衣有領子",
+  "腰帶30cm",
+  "配戴電子裝置（耳機/手機/手錶）",
+  "內搭緊身衣有兩種以上顏色",
+  "大拇指繃帶/貼布 超出手指長度",
 ];
 function seedIfEmpty(){
   ROOM.child("state").once("value", s => { if(!s.exists()) resetMatch(); });
@@ -244,12 +267,14 @@ function resetMatch(){
   ROOM.child("clock").set({running:false, dur:60, remain:60});
   ROOM.child("refs").set({r1:"",r2:"",r3:"",jury:""});
   ROOM.child("lift").set({phase:"idle",desc:""});
+  ROOM.child("equip").set({desc:""});
+  ROOM.child("control").set({hold:false});
   ROOM.child("log").set({});
   pushLog("ev","抓舉 A 組準備開始，請播報叫號。");
 }
 
 // ---- 狀態 ----
-let role=null, state=null, clock=null, refs={r1:"",r2:"",r3:"",jury:""}, lift=null;
+let role=null, state=null, clock=null, refs={r1:"",r2:"",r3:"",jury:""}, lift=null, ctl=null, eq=null;
 
 function join(r){
   role=r; $("roleTag").textContent = ROLE_NAME[r];
@@ -266,11 +291,13 @@ function join(r){
     ROOM.child("clock").on("value", s => { clock=s.val()||{running:false,remain:60,dur:60}; });
     ROOM.child("refs").on("value", s => { refs=s.val()||{r1:"",r2:"",r3:"",jury:""}; render(); });
     ROOM.child("lift").on("value", s => { lift=s.val()||{phase:"idle",desc:""}; render(); });
+    ROOM.child("equip").on("value", s => { eq=s.val()||{desc:""}; render(); });
+    ROOM.child("control").on("value", s => { ctl=s.val()||{hold:false}; render(); });
     ROOM.child("log").on("value", s => renderLog(s.val()));
   });
   setInterval(tickClock, 200);
 }
-const ROLE_NAME={announcer:"🎙️ 播報",timer:"⏱️ 計時",marshal:"🧾 監卡",ref1:"🚦 裁判①",ref2:"🚦 裁判②",ref3:"🚦 裁判③",jury:"🧑‍⚖️ 陪審",director:"🎬 情境台",board:"📺 大螢幕"};
+const ROLE_NAME={announcer:"🎙️ 播報",timer:"⏱️ 計時",marshal:"🧾 監卡",ref1:"🚦 裁判①",ref2:"🚦 裁判②",ref3:"🚦 裁判③",jury:"🧑‍⚖️ 陪審",director:"🎬 情境台",equip:"👕 裝備控制",control:"🔧 技術管制",board:"📺 大螢幕"};
 
 // ---- 順序計算 ----
 function athArr(){ if(!state||!state.athletes) return [];
@@ -296,6 +323,7 @@ function jumpsAheadOfCurrent(id, ai, lot, nw){
 
 // ---- 動作 ----
 function announce(){ const c=current(); if(!c){pushLog("ev","本組抓舉結束 🎉");return;}
+  if(ctl && ctl.hold){ flash(`技術管制未通過：${(eq&&eq.desc)||"裝備不合規"}，不得上台`); return; }   // 不合規 → 擋下叫號
   const same=(c.a.id===(state.prevId||0));
   pushLog("ev",`🎙️ 叫號：${c.a.name}　抓舉第 ${c.p.no} 次 · ${c.p.w} kg`+(same?"（同一選手連續，2:00）":""));
   setCue(same ? "請計時裁判起鐘（同一選手連續 → 2:00）" : "請計時裁判起鐘（1:00）");
@@ -316,14 +344,24 @@ function record(){ // 播報依燈號記錄判定
   ROOM.update(up);
   ROOM.child("refs").set({r1:"",r2:"",r3:"",jury:""});
   ROOM.child("lift").set({phase:"idle",desc:""});
+  ROOM.child("equip").set({desc:""});                  // 換下一位 → 裝備重置
+  ROOM.child("control").set({hold:false});             // 換下一位 → 管制重置
   ROOM.child("clock").set({running:false,dur:60,remain:60});
   pushLog(good?"ok":"no",`${good?"⚪ 成功":"🔴 失敗"}　${c.a.name} 抓舉第 ${i+1} 次 ${w} kg`+(overridden?"（陪審覆議改判）":""));
 }
 function setRef(n,val){ ROOM.child("refs/"+n).set(val); }
 function setLift(phase,desc){ ROOM.child("lift").set({phase,desc}); if(desc) pushLog("ev","🎬 "+desc); }
-function vpt(){ pushLog("ev","🎥 陪審啟動影像回放（VPT）審視中…"); }
+function setControl(hold){
+  ROOM.child("control").set({hold:!!hold});
+  pushLog("ev", hold ? `🔧 技術管制：不符合 → 不得上台，請選手修正` : "🔧 技術管制：合規，准許上台");
+}
+function setEquip(desc){
+  ROOM.child("equip").set({desc:desc||""});
+  if(desc) pushLog("ev", "👕 裝備控制："+desc);
+}
+function vpt(){ pushLog("ev","🎥 審判啟動影像回放（VPT）審視中…"); }
 function juryDecide(val){ ROOM.child("refs/jury").set(val);
-  pushLog("ev", val? `🧑‍⚖️ 陪審覆議：擬改判 ${val==="good"?"⚪ 成功":"🔴 失敗"}` : "🧑‍⚖️ 陪審：維持原判"); }
+  pushLog("ev", val? `🧑‍⚖️ 審判覆議：擬改判 ${val==="good"?"⚪ 成功":"🔴 失敗"}` : "🧑‍⚖️ 審判：維持原判"); }
 // 申報序列：[原始申報, 第1次改, 第2次改]
 function declsOf(x){
   if(x && x.decls){ const d=Array.isArray(x.decls)?x.decls:Object.values(x.decls); if(d.length) return d.slice(); }
@@ -440,16 +478,31 @@ function buildControls(){
       <button onclick="juryDecide('')">維持原判</button>
       <button class="b-good" onclick="juryDecide('good')">推翻→改判成功</button>
       <button class="b-bad" onclick="juryDecide('no')">推翻→改判失敗</button></div>
-    <p class="sub" style="margin-top:8px">陪審多數可推翻裁判判定；設定後由播報「記錄判定」套用。</p>`;
+    <p class="sub" style="margin-top:8px">審判多數可推翻裁判判定；設定後由播報「記錄判定」套用。</p>`;
   else if(role==="director"){
     const opts = LIFT_SCENARIOS.map((s,i)=>
       `<button class="${i===0?'b-good':'b-ghost'}" onclick="setLift('done', LIFT_SCENARIOS[${i}].desc)">${s.label}</button>`).join("");
     h=`<div class="btns">
         <button class="b-blue" onclick="setLift('ready','選手上場、預備動作')">🧍 預備</button>
         <button class="b-bad" onclick="setLift('lifting','槓鈴離地')">🏋️ 槓鈴離地</button></div>
-      <p class="sub" style="margin:10px 0 4px">完成動作（事先建好的情境，挑一個給裁判判讀，等於『影片』）：</p>
+      <p class="sub" style="margin:10px 0 4px">完成動作（選擇情境給裁判判讀，等於『影片』）：</p>
       <div class="btns" style="flex-wrap:wrap">${opts}</div>
-      <p class="sub" style="margin-top:8px">你扮演選手動作（替代影片）。要增減情境選項 → 改檔案上方的 <b>LIFT_SCENARIOS</b> 清單。</p>`;
+      <p class="sub" style="margin-top:8px">你扮演選手動作。要增減情境選項 → 改檔案上方的 <b>LIFT_SCENARIOS</b> 清單。</p>`;
+  }
+  else if(role==="equip"){
+    const issues = EQUIP_ISSUES.map((s,i)=>`<button class="b-bad" onclick="setEquip(EQUIP_ISSUES[${i}])">⛔ ${s}</button>`).join("");
+    h=`<p class="sub">呈現目前選手的裝備/服裝情境（顯示在大螢幕，給技術管制判定）：</p>
+      <div class="btns"><button class="b-good" onclick="setEquip('裝備合規')">✅ 裝備合規</button></div>
+      <p class="sub" style="margin:10px 0 4px">不合規情境（挑一個 → 投到大螢幕）：</p>
+      <div class="btns" style="flex-wrap:wrap">${issues}</div>
+      <p class="sub" style="margin-top:8px">你扮演選手的裝備狀況。要增減情境 → 改檔案上方 <b>EQUIP_ISSUES</b> 清單。</p>`;
+  }
+  else if(role==="control"){
+    h=`<p class="sub">看大螢幕上「👕 裝備檢查」的結果，判定該選手能否上台。</p>
+      <div class="btns">
+        <button class="b-good" onclick="setControl(false)">✅ 合規 · 可上台</button>
+        <button class="b-bad" onclick="setControl(true)">⛔ 不符合 · 不能上台</button></div>
+      <p class="sub" style="margin-top:8px">判「不符合」後，播報無法叫號該選手，直到裝備修正、改判合規。</p>`;
   }
   else h=`<button class="b-ghost" style="font-size:.78rem; padding:7px 12px" onclick="if(confirm('重置整組比賽？'))resetMatch()">↺ 重置整組</button>`;
   c.innerHTML=h;
@@ -470,6 +523,16 @@ function render(){
     else if(ph==="lifting"){ lp.className="liftphase lifting"; lp.textContent="🏋️ 槓鈴離地 — 計時裁判請停錶！"; }
     else { lp.className="liftphase done"; lp.textContent="完成動作："+(lift.desc||"")+"　→ 請裁判判定"; }
   }
+  // 裝備檢查頁（裝備控制呈現 → 投到大螢幕；技術管制也看得到）
+  const em=$("equipMsg");
+  if(em){ const d=eq&&eq.desc; const show=d && (role==="board"||role==="control");
+    if(show){ em.classList.remove("hidden"); const ok=(d==="裝備合規");
+      em.className="equip"+(ok?"":" bad"); em.textContent=(ok?"👕 裝備檢查：✅ ":"👕 裝備檢查：⚠️ ")+d; }
+    else em.classList.add("hidden"); }
+  // 技術管制警示（不符合 → 不得上台，全裝置都看得到）
+  const cm=$("controlMsg");
+  if(cm){ if(ctl && ctl.hold){ cm.classList.remove("hidden"); cm.textContent="🔧 技術管制：不得上台 — "+((eq&&eq.desc)||"裝備不合規")+"（請選手修正）"; }
+    else cm.classList.add("hidden"); }
   // 燈號：三位都判定才顯示
   const votes=[refs.r1,refs.r2,refs.r3];
   const g=votes.filter(x=>x==="good").length, n=votes.filter(x=>x==="no").length;
