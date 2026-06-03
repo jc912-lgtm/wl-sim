@@ -115,22 +115,22 @@
   <!-- 選角色 -->
   <section id="pick" class="card">
     <h1>🏋️ 舉重比賽流程模擬</h1>
-    <p class="sub">男子 65kg A 組 抓舉比賽（3 位選手 · 9 次試舉）</p>
+    <p class="sub">選一個 TO 角色加入比賽<br>男子 65kg A 組 抓舉比賽（3 位選手 · 9 次試舉）</p>
     <div class="roles">
       <button onclick="join('announcer')">🎙️ 播報 Announcer</button>
       <button onclick="join('timer')">⏱️ 計時 Timekeeper</button>
       <button onclick="join('marshal')">🧾 監卡 Marshal</button>
-      <button onclick="join('ref1')">🚦 裁判① Referee 1</button>
-      <button onclick="join('ref2')">🚦 裁判② Referee 2</button>
-      <button onclick="join('ref3')">🚦 裁判③ Referee 3</button>
-      <button onclick="join('jury')">🧑‍⚖️ 審判 Jury</button>
-      <button onclick="join('director')">🎬 情境控制（台上動作）</button>
+      <button onclick="join('ref1')">🚦 裁判①</button>
+      <button onclick="join('ref2')">🚦 裁判②</button>
+      <button onclick="join('ref3')">🚦 裁判③</button>
+      <button onclick="join('jury')">🧑‍⚖️ 陪審 Jury</button>
+      <button onclick="join('director')">🎬 情境台（控動作）</button>
       <button class="b-ghost" style="grid-column:1/-1" onclick="join('board')">📺 大螢幕（投影）</button>
     </div>
     <div class="err" id="pickErr"></div>
     <div class="center" style="margin-top:16px">
       <div class="qr"><img id="qrImg" alt="QR" width="180" height="180"></div>
-      <p class="sub" style="margin-top:8px">📱 學員用手機掃描 QR 進入，各自選一個角色<br>網站版權 JC 所有</p>
+      <p class="sub" style="margin-top:8px">📱 學員用手機掃描 QR 進入，各自選一個角色</p>
     </div>
   </section>
 
@@ -180,6 +180,7 @@
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script>
 "use strict";
 const firebaseConfig = {
@@ -193,6 +194,13 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const ROOM = db.ref("matches/snatchA");
 const $ = id => document.getElementById(id);
+
+// 匿名登入：讓資料庫規則可要求「已登入」，擋掉外部隨機亂寫
+firebase.auth().signInAnonymously().catch(e => console.error("anon auth:", e));
+function whenAuthed(cb){
+  if(firebase.auth().currentUser) return cb();
+  const off = firebase.auth().onAuthStateChanged(u => { if(u){ off(); cb(); } });
+}
 
 // 選角色頁 QR Code（學員掃描進入）
 (function(){ const url=location.origin+location.pathname;
@@ -252,12 +260,14 @@ function join(r){
   if(r==="marshal") $("marshalCard").classList.remove("hidden");
   else $("boardCard").classList.remove("hidden");
   buildControls();
-  seedIfEmpty();
-  ROOM.child("state").on("value", s => { state=s.val(); render(); });
-  ROOM.child("clock").on("value", s => { clock=s.val()||{running:false,remain:60,dur:60}; });
-  ROOM.child("refs").on("value", s => { refs=s.val()||{r1:"",r2:"",r3:"",jury:""}; render(); });
-  ROOM.child("lift").on("value", s => { lift=s.val()||{phase:"idle",desc:""}; render(); });
-  ROOM.child("log").on("value", s => renderLog(s.val()));
+  whenAuthed(() => {
+    seedIfEmpty();
+    ROOM.child("state").on("value", s => { state=s.val(); render(); });
+    ROOM.child("clock").on("value", s => { clock=s.val()||{running:false,remain:60,dur:60}; });
+    ROOM.child("refs").on("value", s => { refs=s.val()||{r1:"",r2:"",r3:"",jury:""}; render(); });
+    ROOM.child("lift").on("value", s => { lift=s.val()||{phase:"idle",desc:""}; render(); });
+    ROOM.child("log").on("value", s => renderLog(s.val()));
+  });
   setInterval(tickClock, 200);
 }
 const ROLE_NAME={announcer:"🎙️ 播報",timer:"⏱️ 計時",marshal:"🧾 監卡",ref1:"🚦 裁判①",ref2:"🚦 裁判②",ref3:"🚦 裁判③",jury:"🧑‍⚖️ 陪審",director:"🎬 情境台",board:"📺 大螢幕"};
