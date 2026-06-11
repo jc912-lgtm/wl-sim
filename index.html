@@ -197,6 +197,10 @@
   body.projector .bav{width:36px; height:36px}
   body.projector .log{height:auto; flex:1; font-size:.98rem; min-height:90px}
   body.projector .curav{display:none}  /* 舞台已有大頭像 */
+  /* 密碼輸入視窗（取代 prompt，輸入以●顯示避免被看到） */
+  .pinmask{position:fixed; inset:0; background:#000c; display:flex; align-items:center; justify-content:center; z-index:99}
+  .pinbox{width:min(320px,90vw); text-align:center}
+  .pinbox input{width:150px; text-align:center; font-size:1.3rem; letter-spacing:6px; margin:12px 0}
 </style></head>
 <body>
 <div class="wrap">
@@ -223,6 +227,19 @@
       <p class="sub" style="margin-top:8px">📱 手機掃描 QR 進入網站</p>
     </div>
   </section>
+
+  <!-- 密碼輸入視窗（取代 prompt，輸入以●顯示） -->
+  <div id="pinModal" class="pinmask hidden">
+    <div class="card pinbox">
+      <p class="sub" id="pinMsg" style="text-align:center"></p>
+      <input id="pinInput" type="password" inputmode="numeric" maxlength="8" placeholder="••••" autocomplete="off"
+        onkeydown="if(event.key==='Enter')pinOk(); else if(event.key==='Escape')pinCancel();">
+      <div style="display:flex; gap:10px; justify-content:center">
+        <button class="b-y" onclick="pinOk()">確定</button>
+        <button class="b-ghost" onclick="pinCancel()">取消</button>
+      </div>
+    </div>
+  </div>
 
   <!-- 主畫面 -->
   <section id="app" class="card hidden">
@@ -535,14 +552,34 @@ function renderRoleGrid(){
 }
 function flashPick(t){ const e=$("pickErr"); e.textContent=t; setTimeout(()=>{ if(e.textContent===t)e.textContent=""; },2500); }
 const JURY_PIN = "9898";   // 審判角色密碼
+let pinCb = null;
+function askPin(msg, cb){
+  $("pinMsg").textContent = msg;
+  $("pinInput").value = "";
+  pinCb = cb;
+  $("pinModal").classList.remove("hidden");
+  setTimeout(()=>$("pinInput").focus(), 50);
+}
+function pinOk(){
+  const v = $("pinInput").value;
+  $("pinModal").classList.add("hidden");
+  const cb = pinCb; pinCb = null;
+  if(cb) cb(v);
+}
+function pinCancel(){ $("pinModal").classList.add("hidden"); pinCb = null; }
 function claimRole(r){
   if(players[r]){ flashPick("這個角色已被 "+players[r].name+" 選走了"); return; }
   if(r==="jury" && localStorage.getItem("wlsim_juryok")!==JURY_PIN){
-    const p = prompt("審判 Jury 為指定人員，請輸入密碼：");
-    if(p===null) return;
-    if(p!==JURY_PIN){ flashPick("密碼錯誤"); return; }
-    localStorage.setItem("wlsim_juryok", p);
+    askPin("審判 Jury 為指定人員，請輸入密碼：", p=>{
+      if(p!==JURY_PIN){ flashPick("密碼錯誤"); return; }
+      localStorage.setItem("wlsim_juryok", p);
+      doClaim(r);
+    });
+    return;
   }
+  doClaim(r);
+}
+function doClaim(r){
   flashPick("登記角色中…");
   const ref=ROOM.child("players/"+r);
   ref.transaction(cur => cur===null ? {name:myName, uid:myUid} : undefined,
@@ -556,9 +593,10 @@ function claimRole(r){
 const BOARD_PIN = "0711";
 function boardJoin(){
   if(localStorage.getItem("wlsim_boardok")===BOARD_PIN){ join("board"); return; }
-  const p = prompt("大螢幕為主持人專用，請輸入密碼：");
-  if(p===BOARD_PIN){ localStorage.setItem("wlsim_boardok", p); join("board"); }
-  else if(p!==null) flashPick("密碼錯誤");
+  askPin("大螢幕為主持人專用，請輸入密碼：", p=>{
+    if(p===BOARD_PIN){ localStorage.setItem("wlsim_boardok", p); join("board"); }
+    else flashPick("密碼錯誤");
+  });
 }
 function leaveRole(){
   if(role && players[role] && players[role].uid===myUid) ROOM.child("players/"+role).remove();
