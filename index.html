@@ -25,11 +25,92 @@
   .b-ghost{background:#2b3566}
   input,select{font-family:inherit; font-size:1rem; padding:11px; border-radius:10px;
     border:1px solid var(--line); background:#11163099; color:var(--ink); outline:none}
-  .roles{display:grid; grid-template-columns:1fr 1fr; gap:10px}
-  .roles button{padding:18px 10px; font-size:1.05rem}
   .center{text-align:center}
   .qr{background:#fff; padding:10px; border-radius:12px; display:inline-block} .qr img{display:block}
   .url{word-break:break-all; font-size:.85rem; color:var(--accent); margin-top:8px}
+
+  /* ===== 大廳 / 選角 ===== */
+  #nameStep{display:flex; gap:10px; justify-content:center; margin:14px 0}
+  #nameStep input{flex:1; max-width:260px; text-align:center; font-size:1.1rem}
+  .roles{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+  .rolebtn{display:flex; flex-direction:column; align-items:flex-start; gap:3px; text-align:left;
+    padding:12px 14px; position:relative; overflow:hidden}
+  .rolebtn .rn{font-size:1.02rem}
+  .rolebtn .rd{font-size:.75rem; color:var(--muted); font-weight:500}
+  .rolebtn .occ{font-size:.78rem; color:var(--accent); font-weight:700}
+  .rolebtn.taken{opacity:.55; outline:2px solid var(--good); cursor:not-allowed}
+  .rolebtn.taken .occ{color:var(--good)}
+  .hello{color:var(--accent); font-weight:800}
+
+  /* ===== 任務卡 / 得分 ===== */
+  .task{border-radius:14px; padding:11px 14px; margin:10px 0; background:#1b2247;
+    border:1px solid var(--line); color:var(--muted); font-weight:600; font-size:.95rem}
+  .task.hot{background:linear-gradient(135deg,#6e5300,#9a7400); color:#fff;
+    border:1.5px solid var(--accent); animation:taskpulse 1.2s ease infinite}
+  @keyframes taskpulse{50%{box-shadow:0 0 0 7px #ffd23f2e}}
+  .pill{display:inline-block;background:#2b3566;color:var(--muted);border-radius:999px;padding:3px 11px;font-size:.78rem}
+  .pill.gold{background:#5a4a13; color:var(--accent); font-weight:800; font-size:.88rem}
+
+  /* ===== 排行榜 / 結算 ===== */
+  .ranks{font-size:.92rem}
+  .ranks .row{display:flex; align-items:center; gap:8px; padding:5px 4px; border-bottom:1px solid #2a3157}
+  .ranks .row.me{background:#5a4a1333; outline:1px solid var(--accent); border-radius:8px}
+  .ranks .pos{width:26px; text-align:center; font-weight:800}
+  .ranks .pn{flex:1; font-weight:700} .ranks .pr{color:var(--muted); font-size:.78rem}
+  .ranks .pp{font-weight:900; color:var(--accent); font-variant-numeric:tabular-nums}
+  .ovl{position:fixed; inset:0; background:#0c0f24ee; z-index:50; overflow:auto; padding:24px 14px}
+  .ovl .inner{max-width:680px; margin:0 auto; text-align:center}
+  .ovl h1{font-size:1.7rem; color:var(--accent)}
+  .podium{display:flex; align-items:flex-end; justify-content:center; gap:12px; margin:22px 0 18px}
+  .pod{width:150px; border-radius:14px 14px 0 0; padding:12px 8px 12px;
+    background:linear-gradient(180deg,#2b3566,#1c2348);
+    display:flex; flex-direction:column; align-items:center; justify-content:flex-start; gap:3px}
+  .pod img{width:60px; height:60px; border-radius:18%; object-fit:cover}
+  .pod .pname{font-weight:900; font-size:1.05rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%}
+  .pod .prole{color:var(--muted); font-size:.75rem}
+  .pod .ppts{color:var(--accent); font-weight:900; font-size:1.2rem}
+  .pod .med{font-size:1.9rem; line-height:1.1}
+  .pod.g{min-height:215px; background:linear-gradient(180deg,#6e5300,#3d2f00); outline:2px solid var(--accent)}
+  .pod.s{min-height:180px} .pod.b{min-height:160px}
+
+  /* ===== 舞台動畫（大螢幕）===== */
+  .stage{position:relative; height:330px; border-radius:16px; overflow:hidden; margin-bottom:12px;
+    background:linear-gradient(180deg,#070a1c 0%,#141b46 70%,#1d2452 100%)}
+  .spot{position:absolute; top:-40px; width:300px; height:420px; opacity:.16; pointer-events:none;
+    background:radial-gradient(ellipse at top,#fff8d0,transparent 70%)}
+  .spot.s1{left:8%; transform:rotate(14deg)} .spot.s2{right:8%; transform:rotate(-14deg)}
+  .stage .platform{position:absolute; bottom:14px; left:50%; transform:translateX(-50%);
+    width:74%; height:26px; border-radius:6px; background:linear-gradient(180deg,#8a6534,#5d4421);
+    box-shadow:0 8px 22px #000a}
+  .stage svg{position:absolute; left:0; right:0; bottom:26px; width:100%; height:calc(100% - 40px); z-index:2}
+  .pose{opacity:0; transition:opacity .22s}
+  .stage.phase-idle #poseStand{opacity:1}
+  .stage.phase-ready #poseSet{opacity:1; animation:bounce 1.1s ease infinite}
+  .stage.phase-lifting #posePull{opacity:1}
+  .stage.phase-done #poseOver{opacity:1}
+  @keyframes bounce{50%{transform:translateY(-5px)}}
+  .stage.phase-lifting #posePull{animation:strain .35s ease infinite}
+  @keyframes strain{50%{transform:translateY(3px)}}
+  .stage.phase-done #poseOver{animation:lockout .55s cubic-bezier(.3,1.6,.5,1)}
+  @keyframes lockout{from{transform:translateY(30px); opacity:.3}}
+  #fallBar{opacity:0}
+  .stage.drop .pose{opacity:0 !important}
+  .stage.drop #poseStand{opacity:1 !important}
+  .stage.drop #fallBar{opacity:1; animation:barfall .45s ease-in forwards}
+  @keyframes barfall{to{transform:translateY(206px)}}
+  .stage .stName{position:absolute; top:10px; left:50%; transform:translateX(-50%); z-index:4;
+    background:#111630cc; border:1px solid var(--line); border-radius:999px; padding:6px 18px;
+    font-weight:900; font-size:1.15rem; white-space:nowrap}
+  .stage .stName b{color:var(--accent)}
+  .stage .stDesc{position:absolute; bottom:50px; right:14px; max-width:38%; z-index:4;
+    background:#5a4a13ee; border:1.5px solid var(--accent); color:#ffe9a8; border-radius:12px;
+    padding:10px 12px; font-weight:800; font-size:1.05rem}
+  #confetti{position:absolute; inset:0; pointer-events:none; overflow:hidden; z-index:6}
+  #confetti span{position:absolute; top:-14px; width:10px; height:14px; border-radius:2px;
+    animation:fall linear forwards}
+  @keyframes fall{to{transform:translateY(380px) rotate(720deg); opacity:.15}}
+  .flashbad{animation:fbad .5s ease 2}
+  @keyframes fbad{50%{box-shadow:inset 0 0 80px #ff5d5d88}}
 
   /* 狀態列 */
   .status{display:flex; align-items:center; gap:14px}
@@ -47,6 +128,9 @@
   .lights{display:flex; gap:14px; justify-content:center; margin:10px 0}
   .lt{width:46px; height:46px; border-radius:50%; background:#11163088; border:2px solid var(--line)}
   .lt.good{background:#eef2f7; border-color:#fff} .lt.no{background:var(--bad); border-color:#fff}
+  .lt.pop{animation:ltpop .5s cubic-bezier(.3,1.6,.5,1) backwards}
+  .lt.pop:nth-child(2){animation-delay:.12s} .lt.pop:nth-child(3){animation-delay:.24s}
+  @keyframes ltpop{from{transform:scale(.2); opacity:0}}
   .down{text-align:center; font-size:1.35rem; font-weight:900; color:#16203a; background:#eef2f7;
     border:2px solid #fff; border-radius:12px; padding:8px; margin:4px 0 8px; animation:cb .6s steps(2) infinite}
   .liftphase{text-align:center; font-weight:800; border-radius:12px; padding:10px; margin:6px 0; font-size:1.05rem; border:1px solid var(--line)}
@@ -68,7 +152,7 @@
   td.nm{text-align:left; font-weight:600} tr.cur{background:#2b356633; outline:2px solid var(--accent)}
   .cell{display:inline-block; min-width:40px; padding:4px 6px; border-radius:8px; font-weight:800}
   .pend{background:#11163088} .good{background:var(--good); color:#06381f} .fail{background:var(--bad); color:#3a0808}
-  .cell.lifting{animation:cb .6s steps(2) infinite}  /* 正在台上舉：維持深藍底，只閃爍 */
+  .cell.lifting{animation:cb .6s steps(2) infinite}
   .wedit{width:62px; padding:5px; text-align:center; font-weight:800; border-radius:8px;
     border:1.5px solid var(--accent); background:#11163088; color:var(--ink); font-size:.92rem}
   .wedit:disabled{border-color:var(--line); opacity:.55}
@@ -87,67 +171,193 @@
   .atbl .ac-fail{background:var(--bad); color:#3a0808}
   .atbl .wedit{width:58px}
   .atbl .ac-auto{color:var(--muted)}
-  /* 監卡：只看試舉卡，隱藏上方狀態/燈號/控制 */
   body.mrole .status, body.mrole .cue, body.mrole #liftPhase, body.mrole .down, body.mrole .lights, body.mrole #ctrl{display:none}
   .ord{color:var(--muted); font-size:.78rem}
-  .pill{display:inline-block;background:#2b3566;color:var(--muted);border-radius:999px;padding:3px 11px;font-size:.78rem}
   .log{height:120px; overflow-y:auto; font-size:.85rem; line-height:1.6; background:#0d112466;
     border:1px solid var(--line); border-radius:10px; padding:8px 10px}
   .log .ok{color:var(--good)} .log .no{color:var(--bad)} .log .ev{color:var(--accent)}
-  .err{color:var(--bad); font-size:.85rem; min-height:1.1em}
-  /* 📺 大螢幕投影：左右兩欄、填滿螢幕、放大字級 */
+  .err{color:var(--bad); font-size:.85rem; min-height:1.1em; text-align:center; margin-top:8px}
+  /* 📺 大螢幕投影 */
   body.projector{padding:0; overflow:hidden}
   body.projector .wrap{max-width:none; width:100vw; height:100vh; display:flex; gap:14px; padding:14px}
-  body.projector #app{flex:1.1; margin-bottom:0; overflow:auto; display:flex; flex-direction:column}
+  body.projector #app{flex:1.15; margin-bottom:0; overflow:auto; display:flex; flex-direction:column}
   body.projector #boardCard{flex:1; margin-bottom:0; overflow:auto}
-  body.projector .who .nm{font-size:2.6rem}
-  body.projector .who .att{font-size:1.2rem}
-  body.projector .who .wt{font-size:1.4rem}
-  body.projector .curav{width:270px; height:270px}
-  body.projector .clock{font-size:4.6rem; min-width:210px; padding:10px 22px}
+  body.projector .who .nm{font-size:2.2rem}
+  body.projector .who .att{font-size:1.1rem}
+  body.projector .who .wt{font-size:1.35rem}
+  body.projector .clock{font-size:4.2rem; min-width:200px; padding:10px 22px}
   body.projector .cue{font-size:1.3rem}
-  body.projector .liftphase{font-size:1.6rem; padding:16px}
+  body.projector .liftphase{font-size:1.5rem; padding:14px}
   body.projector .down{font-size:2.2rem; padding:14px}
   body.projector .lt{width:62px; height:62px}
-  body.projector h2{font-size:1.15rem}
-  body.projector table{font-size:1.25rem}
-  body.projector th{font-size:1rem}
-  body.projector .cell{min-width:56px; font-size:1.15rem; padding:6px 8px}
-  body.projector .bav{width:38px; height:38px}
-  body.projector .log{height:auto; flex:1; font-size:1rem}
+  body.projector h2{font-size:1.1rem}
+  body.projector table{font-size:1.18rem}
+  body.projector th{font-size:.95rem}
+  body.projector .cell{min-width:54px; font-size:1.1rem; padding:6px 8px}
+  body.projector .bav{width:36px; height:36px}
+  body.projector .log{height:auto; flex:1; font-size:.98rem; min-height:90px}
+  body.projector .curav{display:none}  /* 舞台已有大頭像 */
 </style></head>
 <body>
 <div class="wrap">
 
-  <!-- 選角色 -->
-  <section id="pick" class="card">
-    <h1>🏋️ 舉重比賽模擬 TO 角色扮演</h1>
-    <p class="sub">男子 65 kg A 組 抓舉比賽（3 位選手 · 9 次試舉）</p>
-    <div class="roles">
-      <button onclick="join('announcer')">🎙️ 播報 Announcer</button>
-      <button onclick="join('timer')">⏱️ 計時 Timekeeper</button>
-      <button onclick="join('marshal')">🧾 監卡 Marshal</button>
-      <button onclick="join('ref1')">🚦 裁判① Referee 1</button>
-      <button onclick="join('ref2')">🚦 裁判② Referee 2</button>
-      <button onclick="join('ref3')">🚦 裁判③ Referee 3</button>
-      <button onclick="join('jury')">🧑‍⚖️ 審判 Jury</button>
-      <button onclick="join('director')">🎬 情境控制（台上動作）</button>
-      <button onclick="join('equip')">👕 裝備控制（選手服裝）</button>
-      <button onclick="join('control')">🔧 技術管制員 Technical Controller</button>
-      <button class="b-ghost" style="grid-column:1/-1" onclick="join('board')">📺 大螢幕（投影）</button>
+  <!-- 大廳：暱稱 → 選角色（角色鎖定） -->
+  <section id="lobby" class="card">
+    <h1>🏋️ 舉重比賽模擬 — TO 角色扮演</h1>
+    <p class="sub" style="text-align:center">男子 65 kg A 組 抓舉比賽（3 位選手 · 9 次試舉）</p>
+    <div id="nameStep">
+      <input id="nick" placeholder="輸入你的暱稱" maxlength="12" onkeydown="if(event.key==='Enter')setNick()">
+      <button class="b-y" onclick="setNick()">進入大廳</button>
+    </div>
+    <div id="roleStep" class="hidden">
+      <p class="sub" style="text-align:center">哈囉 <span class="hello" id="helloName"></span>！選擇你的角色（一個角色只能一人扮演）：</p>
+      <div class="roles" id="roleGrid"></div>
+      <div class="roles" style="margin-top:10px">
+        <button class="b-ghost" onclick="boardJoin()">📺 大螢幕（投影）🔒</button>
+        <button class="b-ghost" onclick="join('spect')">👀 觀眾席（旁觀）</button>
+      </div>
     </div>
     <div class="err" id="pickErr"></div>
     <div class="center" style="margin-top:16px">
       <div class="qr"><img id="qrImg" alt="QR" width="180" height="180"></div>
-      <p class="sub" style="margin-top:8px">📱 學員用手機掃描 QR 進入，選一個角色<br>網站版權 JC 所有</p>
+      <p class="sub" style="margin-top:8px">📱 手機掃描 QR 進入網站</p>
     </div>
   </section>
 
   <!-- 主畫面 -->
   <section id="app" class="card hidden">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px">
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:10px">
       <span class="pill" id="roleTag">角色</span>
-      <button class="b-ghost" style="font-size:.8rem; padding:6px 10px" onclick="location.reload()">換角色</button>
+      <button class="b-ghost hidden" id="sndBtn" style="font-size:.8rem; padding:6px 10px" onclick="toggleAudio()">🔊 音效開</button>
+      <select id="langSel" class="hidden" style="font-size:.8rem; padding:6px 8px" onchange="pickLang(this.value)">
+        <option value="zh">🗣️ 中文</option><option value="en">🗣️ 英文</option><option value="both">🗣️ 中＋英</option></select>
+      <button class="b-ghost" style="font-size:.8rem; padding:6px 10px; margin-left:auto" onclick="leaveRole()">換角色</button>
+    </div>
+
+    <!-- 🎭 舞台（只在大螢幕顯示） -->
+    <div id="stage" class="stage hidden">
+      <div class="spot s1"></div><div class="spot s2"></div>
+      <div class="stName" id="stName">等待叫號…</div>
+      <svg id="lifterSvg" viewBox="0 0 460 300" preserveAspectRatio="xMidYMax meet">
+        <defs>
+          <clipPath id="clipF1"><circle cx="230" cy="92" r="29"/></clipPath>
+          <clipPath id="clipF2"><circle cx="230" cy="122" r="29"/></clipPath>
+          <clipPath id="clipF3"><circle cx="230" cy="140" r="29"/></clipPath>
+          <!-- 三位選手的 Q 版臉（local 座標：頭心 0,0 半徑 32）-->
+          <g id="face1"><!-- 陳小猛：黑刺蝟頭＋紅髮帶＋開朗笑 -->
+            <path d="M-31,-8 Q-28,-26 -14,-30 L-10,-21 L-4,-32 L2,-22 L8,-33 L14,-22 L21,-30 Q29,-24 31,-8 Q16,-17 0,-17 Q-16,-17 -31,-8 Z" fill="#2b2b2b"/>
+            <rect x="-30" y="-15" width="60" height="8" rx="4" fill="#e23b3b"/>
+            <circle cx="-11" cy="1" r="3.6" fill="#222"/><circle cx="11" cy="1" r="3.6" fill="#222"/>
+            <path d="M-17,-6 L-5,-8 M5,-8 L17,-6" stroke="#222" stroke-width="3" stroke-linecap="round" fill="none"/>
+            <path d="M-9,11 Q0,20 9,11" stroke="#a33" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+            <circle cx="-18" cy="9" r="4.5" fill="#ff9d9d" opacity=".5"/><circle cx="18" cy="9" r="4.5" fill="#ff9d9d" opacity=".5"/>
+          </g>
+          <g id="face2"><!-- 王大凱：棕色平頭＋藍髮帶＋自信抿嘴 -->
+            <path d="M-31,-9 Q0,-37 31,-9 Q15,-19 0,-19 Q-15,-19 -31,-9 Z" fill="#4a3320"/>
+            <rect x="-30" y="-15" width="60" height="8" rx="4" fill="#1469c7"/>
+            <circle cx="-11" cy="1" r="3.2" fill="#222"/><circle cx="11" cy="1" r="3.2" fill="#222"/>
+            <path d="M-17,-7 L-5,-7 M5,-7 L17,-7" stroke="#222" stroke-width="3.4" stroke-linecap="round" fill="none"/>
+            <path d="M-7,12 Q0,15 7,12" stroke="#a33" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+          </g>
+          <g id="face3"><!-- 林阿強：金黃爆炸捲捲頭＋綠髮帶＋咬牙拚勁 -->
+            <circle cx="-26" cy="-14" r="10" fill="#f5c518"/><circle cx="26" cy="-14" r="10" fill="#f5c518"/>
+            <circle cx="-19" cy="-25" r="11" fill="#f5c518"/><circle cx="19" cy="-25" r="11" fill="#f5c518"/>
+            <circle cx="-7" cy="-31" r="12" fill="#f5c518"/><circle cx="7" cy="-31" r="12" fill="#f5c518"/>
+            <circle cx="0" cy="-26" r="13" fill="#f5c518"/>
+            <circle cx="-31" cy="-3" r="8" fill="#f5c518"/><circle cx="31" cy="-3" r="8" fill="#f5c518"/>
+            <path d="M-31,-8 Q0,-30 31,-8 Q15,-17 0,-17 Q-15,-17 -31,-8 Z" fill="#f5c518"/>
+            <rect x="-30" y="-13" width="60" height="8" rx="4" fill="#2ec27e"/>
+            <circle cx="-11" cy="1" r="3.4" fill="#222"/><circle cx="11" cy="1" r="3.4" fill="#222"/>
+            <path d="M-17,-8 L-4,-4 M4,-4 L17,-8" stroke="#222" stroke-width="3.2" stroke-linecap="round" fill="none"/>
+            <rect x="-9" y="9" width="18" height="8" rx="3" fill="#fff" stroke="#a33" stroke-width="2.5"/>
+            <line x1="0" y1="9" x2="0" y2="17" stroke="#a33" stroke-width="1.5"/>
+          </g>
+        </defs>
+        <!-- 姿勢A：站立（槓鈴在地）-->
+        <g id="poseStand" class="pose">
+          <rect x="80" y="264" width="300" height="8" rx="4" fill="#aeb9d8"/>
+          <ellipse cx="95" cy="268" rx="13" ry="30" fill="#c01616" stroke="#7e0d0d" stroke-width="3"/>
+          <ellipse cx="365" cy="268" rx="13" ry="30" fill="#c01616" stroke="#7e0d0d" stroke-width="3"/>
+          <ellipse cx="122" cy="268" rx="9" ry="22" fill="#1646c0" stroke="#0d3a7e" stroke-width="3"/>
+          <ellipse cx="338" cy="268" rx="9" ry="22" fill="#1646c0" stroke="#0d3a7e" stroke-width="3"/>
+          <rect x="206" y="195" width="17" height="72" rx="8" fill="#1d2a55"/>
+          <rect x="237" y="195" width="17" height="72" rx="8" fill="#1d2a55"/>
+          <rect x="200" y="258" width="28" height="13" rx="6" fill="#222"/>
+          <rect x="232" y="258" width="28" height="13" rx="6" fill="#222"/>
+          <rect x="186" y="128" width="14" height="60" rx="7" fill="#f2c79a" transform="rotate(10 193 128)"/>
+          <rect x="260" y="128" width="14" height="60" rx="7" fill="#f2c79a" transform="rotate(-10 267 128)"/>
+          <rect x="196" y="120" width="68" height="84" rx="20" fill="#e23b3b"/>
+          <rect x="196" y="182" width="68" height="12" fill="#ffd23f"/>
+          <circle cx="230" cy="92" r="32" fill="#f2c79a" stroke="#fff" stroke-width="4"/>
+          <use class="stFace" href="#face1" transform="translate(230,92)"/>
+        </g>
+        <!-- 姿勢A2：預備蹲姿（蹲下、寬握距摸槓）-->
+        <g id="poseSet" class="pose">
+          <rect x="80" y="264" width="300" height="8" rx="4" fill="#aeb9d8"/>
+          <ellipse cx="95" cy="268" rx="13" ry="30" fill="#c01616" stroke="#7e0d0d" stroke-width="3"/>
+          <ellipse cx="365" cy="268" rx="13" ry="30" fill="#c01616" stroke="#7e0d0d" stroke-width="3"/>
+          <ellipse cx="122" cy="268" rx="9" ry="22" fill="#1646c0" stroke="#0d3a7e" stroke-width="3"/>
+          <ellipse cx="338" cy="268" rx="9" ry="22" fill="#1646c0" stroke="#0d3a7e" stroke-width="3"/>
+          <rect x="192" y="222" width="18" height="44" rx="8" fill="#1d2a55"/>
+          <rect x="250" y="222" width="18" height="44" rx="8" fill="#1d2a55"/>
+          <rect x="184" y="258" width="30" height="13" rx="6" fill="#222"/>
+          <rect x="246" y="258" width="30" height="13" rx="6" fill="#222"/>
+          <rect x="196" y="176" width="13" height="104" rx="6" fill="#f2c79a" transform="rotate(36 202 176)"/>
+          <rect x="252" y="176" width="13" height="104" rx="6" fill="#f2c79a" transform="rotate(-36 258 176)"/>
+          <rect x="196" y="166" width="68" height="64" rx="20" fill="#e23b3b"/>
+          <rect x="196" y="212" width="68" height="12" fill="#ffd23f"/>
+          <circle cx="140" cy="262" r="9" fill="#f2c79a"/><circle cx="320" cy="262" r="9" fill="#f2c79a"/>
+          <circle cx="230" cy="140" r="32" fill="#f2c79a" stroke="#fff" stroke-width="4"/>
+          <use class="stFace" href="#face1" transform="translate(230,140)"/>
+        </g>
+        <!-- 姿勢B：拉槓（槓鈴到膝）-->
+        <g id="posePull" class="pose">
+          <rect x="196" y="212" width="18" height="52" rx="8" fill="#1d2a55"/>
+          <rect x="246" y="212" width="18" height="52" rx="8" fill="#1d2a55"/>
+          <rect x="188" y="258" width="30" height="13" rx="6" fill="#222"/>
+          <rect x="242" y="258" width="30" height="13" rx="6" fill="#222"/>
+          <rect x="196" y="150" width="68" height="72" rx="20" fill="#e23b3b"/>
+          <rect x="196" y="202" width="68" height="12" fill="#ffd23f"/>
+          <rect x="194" y="155" width="13" height="82" rx="6" fill="#f2c79a" transform="rotate(46 200 155)"/>
+          <rect x="254" y="155" width="13" height="82" rx="6" fill="#f2c79a" transform="rotate(-46 260 155)"/>
+          <rect x="80" y="211" width="300" height="8" rx="4" fill="#aeb9d8"/>
+          <ellipse cx="95" cy="215" rx="13" ry="30" fill="#c01616" stroke="#7e0d0d" stroke-width="3"/>
+          <ellipse cx="365" cy="215" rx="13" ry="30" fill="#c01616" stroke="#7e0d0d" stroke-width="3"/>
+          <ellipse cx="122" cy="215" rx="9" ry="22" fill="#1646c0" stroke="#0d3a7e" stroke-width="3"/>
+          <ellipse cx="338" cy="215" rx="9" ry="22" fill="#1646c0" stroke="#0d3a7e" stroke-width="3"/>
+          <circle cx="142" cy="215" r="9" fill="#f2c79a"/><circle cx="318" cy="215" r="9" fill="#f2c79a"/>
+          <circle cx="230" cy="122" r="32" fill="#f2c79a" stroke="#fff" stroke-width="4"/>
+          <use class="stFace" href="#face1" transform="translate(230,122)"/>
+        </g>
+        <!-- 姿勢C：過頭鎖定 -->
+        <g id="poseOver" class="pose">
+          <rect x="206" y="195" width="17" height="72" rx="8" fill="#1d2a55"/>
+          <rect x="237" y="195" width="17" height="72" rx="8" fill="#1d2a55"/>
+          <rect x="200" y="258" width="28" height="13" rx="6" fill="#222"/>
+          <rect x="232" y="258" width="28" height="13" rx="6" fill="#222"/>
+          <rect x="196" y="120" width="68" height="84" rx="20" fill="#e23b3b"/>
+          <rect x="196" y="182" width="68" height="12" fill="#ffd23f"/>
+          <rect x="185" y="56" width="14" height="72" rx="7" fill="#f2c79a" transform="rotate(-28 192 128)"/>
+          <rect x="261" y="56" width="14" height="72" rx="7" fill="#f2c79a" transform="rotate(28 268 128)"/>
+          <rect x="80" y="54" width="300" height="8" rx="4" fill="#aeb9d8"/>
+          <ellipse cx="95" cy="58" rx="13" ry="30" fill="#c01616" stroke="#7e0d0d" stroke-width="3"/>
+          <ellipse cx="365" cy="58" rx="13" ry="30" fill="#c01616" stroke="#7e0d0d" stroke-width="3"/>
+          <ellipse cx="122" cy="58" rx="9" ry="22" fill="#1646c0" stroke="#0d3a7e" stroke-width="3"/>
+          <ellipse cx="338" cy="58" rx="9" ry="22" fill="#1646c0" stroke="#0d3a7e" stroke-width="3"/>
+          <circle cx="158" cy="62" r="9" fill="#f2c79a"/><circle cx="302" cy="62" r="9" fill="#f2c79a"/>
+          <circle cx="230" cy="92" r="32" fill="#f2c79a" stroke="#fff" stroke-width="4"/>
+          <use class="stFace" href="#face1" transform="translate(230,92)"/>
+        </g>
+        <!-- 失敗：墜落的槓鈴 -->
+        <g id="fallBar">
+          <rect x="80" y="54" width="300" height="8" rx="4" fill="#aeb9d8"/>
+          <ellipse cx="95" cy="58" rx="13" ry="30" fill="#c01616" stroke="#7e0d0d" stroke-width="3"/>
+          <ellipse cx="365" cy="58" rx="13" ry="30" fill="#c01616" stroke="#7e0d0d" stroke-width="3"/>
+        </g>
+      </svg>
+      <div class="platform"></div>
+      <div class="stDesc hidden" id="stDesc"></div>
+      <div id="confetti"></div>
     </div>
 
     <div class="status">
@@ -160,6 +370,7 @@
       <div class="clock" id="clock">1:00</div>
     </div>
     <div class="cue" id="cue"></div>
+    <div class="task hidden" id="taskCard"></div>
     <div class="equip hidden" id="equipMsg"></div>
     <div class="control hidden" id="controlMsg"></div>
     <div class="liftphase" id="liftPhase" style="display:none"></div>
@@ -187,7 +398,20 @@
     <h2 style="margin-top:12px">📝 換把紀錄</h2>
     <div class="log" id="mLog"></div>
   </section>
+
+  <!-- 🏁 賽後結算 MVP -->
+  <div id="resultOv" class="ovl hidden"><div class="inner">
+    <h1>🏁 抓舉比賽結束</h1>
+    <p class="sub">最終排名</p>
+    <div class="podium" id="podium"></div>
+    <div class="card" style="text-align:left"><div class="ranks" id="finalRanks"></div></div>
+    <button class="b-y" onclick="$('resultOv').classList.add('hidden')">關閉結算畫面</button>
+  </div></div>
 </div>
+
+<footer style="text-align:center; color:#6b73a0; font-size:.78rem; margin:18px 0 28px">
+  舉重比賽模擬 · TO 角色扮演 · 教學用<br>Copyright © 2026 Jessie Lan
+</footer>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
@@ -206,16 +430,13 @@ const db = firebase.database();
 const ROOM = db.ref("matches/snatchA");
 const $ = id => document.getElementById(id);
 
-// 匿名登入：讓資料庫規則可要求「已登入」，擋掉外部隨機亂寫
+// 玩家識別：用 localStorage 產生穩定 ID（不等匿名登入，登入只在背景嘗試）
+let myUid = localStorage.getItem("wlsim_uid");
+if(!myUid){ myUid = "u" + Math.random().toString(36).slice(2,10); localStorage.setItem("wlsim_uid", myUid); }
 firebase.auth().signInAnonymously().catch(e => console.error("anon auth:", e));
-function whenAuthed(cb){
-  if(firebase.auth().currentUser) return cb();
-  const off = firebase.auth().onAuthStateChanged(u => { if(u){ off(); cb(); } });
-}
 
-// 選角色頁 QR Code（學員掃描進入）
+// QR Code
 (function(){ const url=location.origin+location.pathname;
-  const u=$("joinUrl"); if(u) u.textContent=url;
   const img=$("qrImg"); if(img) img.src="https://api.qrserver.com/v1/create-qr-code/?size=360x360&margin=0&data="+encodeURIComponent(url);
 })();
 
@@ -234,23 +455,23 @@ const SEED = {
   bar: 0
 };
 const AV_BY_ID = {1:"avatars/baby.png", 2:"avatars/tia.png", 3:"avatars/wang.png"};
+const EN_BY_ID = {1:"CHEN Hsiao-Meng", 2:"WANG Ta-Kai", 3:"LIN A-Chiang"};   // 英文播報用拼音名
 let lastDecided = false;
 
-// ★★ 事先建立好的「完成動作」情境選項 —— 要增減/修改就改這個清單即可 ★★
-//    label = 按鈕文字；desc = 投影給裁判判讀的動作描述
+// ★★ 完成動作情境（correct = 正確判定，用來給裁判計分）★★
 const LIFT_SCENARIOS = [
-  {label:"✅ 標準成功",  desc:"動作標準、一次到位"},
-  {label:"⚠️ 二次推", desc:"手臂二次推（press-out）"},
-  {label:"⚠️ 二次發力", desc:"槓鈴在上升過程中停頓"},
-  {label:"⚠️ 槓鈴離地又放下", desc:"槓鈴離地未過膝、又放回地面"},
-  {label:"⚠️ 手肘碰膝",  desc:"過程手肘觸碰膝蓋或大腿"},
-  {label:"⚠️ 成功，但搶信號", desc:"動作標準、但未等信號就放下"},
-  {label:"⚠️ 尚未靜止",    desc:"身體/手臂未固定、明顯晃動尚未靜止"},
-  {label:"⚠️ 身體觸地",    desc:"膝蓋或身體（非雙腳）觸碰舉重台"},
-  {label:"⚠️ 成功，肩上丟槓", desc:"得白燈後，從肩上直接摔下槓鈴"},
-  {label:"⚠️ 成功，槓鈴落在台下",  desc:"得白燈後，槓鈴掉落到舉重台以外的地方"},
+  {label:"✅ 標準成功",  desc:"動作標準、一次到位", correct:"good"},
+  {label:"⚠️ 二次推", desc:"手臂二次推（press-out）", correct:"no"},
+  {label:"⚠️ 二次發力", desc:"槓鈴在上升過程中停頓", correct:"no"},
+  {label:"⚠️ 槓鈴離地又放下", desc:"槓鈴離地未過膝、又放回地面", correct:"no"},
+  {label:"⚠️ 手肘碰膝",  desc:"過程手肘觸碰膝蓋或大腿", correct:"no"},
+  {label:"⚠️ 成功，但搶信號", desc:"動作標準、但未等信號就放下", correct:"no"},
+  {label:"⚠️ 尚未靜止",    desc:"身體/手臂未固定、明顯晃動尚未靜止", correct:"no"},
+  {label:"⚠️ 身體觸地",    desc:"膝蓋或身體（非雙腳）觸碰舉重台", correct:"no"},
+  {label:"⚠️ 成功，肩上丟槓", desc:"得白燈後，從肩上直接摔下槓鈴", correct:"no"},
+  {label:"⚠️ 成功，槓鈴落在台下",  desc:"得白燈後，槓鈴掉落到舉重台以外的地方", correct:"no"},
 ];
-// ★★ 裝備控制：選手裝備/服裝情境（可自行增減；呈現在大螢幕給技術管制判定）★★
+// ★★ 裝備控制情境（全部為不合規 → 技術管制應判「不得上台」）★★
 const EQUIP_ISSUES = [
   "手肘 10cm 內貼有貼布",
   "上衣有領子",
@@ -259,6 +480,7 @@ const EQUIP_ISSUES = [
   "內搭緊身衣有兩種以上顏色",
   "大拇指繃帶/貼布 超出手指長度",
 ];
+
 function seedIfEmpty(){
   ROOM.child("state").once("value", s => { if(!s.exists()) resetMatch(); });
 }
@@ -266,26 +488,101 @@ function resetMatch(){
   ROOM.child("state").set(SEED);
   ROOM.child("clock").set({running:false, dur:60, remain:60});
   ROOM.child("refs").set({r1:"",r2:"",r3:"",jury:""});
-  ROOM.child("lift").set({phase:"idle",desc:""});
+  ROOM.child("lift").set({phase:"idle",desc:"",correct:""});
   ROOM.child("equip").set({desc:""});
   ROOM.child("control").set({hold:false});
+  ROOM.child("flow").set("announce");
   ROOM.child("log").set({});
   pushLog("ev","抓舉 A 組準備開始，請播報叫號。");
 }
 
+// ---- 角色定義（大廳）----
+const ROLE_DEFS = [
+  {id:"announcer", e:"🎙️", n:"播報 Announcer",   d:"叫號選手・記錄判定"},
+  {id:"timer",     e:"⏱️", n:"計時 Timekeeper",  d:"起鐘・槓鈴離地停錶"},
+  {id:"marshal",   e:"🧾", n:"監卡 Marshal",     d:"受理教練換把"},
+  {id:"ref1",      e:"🚦", n:"裁判① Referee 1",  d:"判定成功 / 失敗"},
+  {id:"ref2",      e:"🚦", n:"裁判② Referee 2",  d:"判定成功 / 失敗"},
+  {id:"ref3",      e:"🚦", n:"裁判③ Referee 3",  d:"判定成功 / 失敗"},
+  {id:"jury",      e:"🧑‍⚖️", n:"審判 Jury 🔒",    d:"VPT 回放・覆議改判（需密碼）"},
+  {id:"director",  e:"🎬", n:"情境控制",          d:"扮演台上選手動作"},
+  {id:"equip",     e:"👕", n:"裝備控制",          d:"扮演選手裝備狀況"},
+  {id:"control",   e:"🔧", n:"技術管制 TC",      d:"檢查裝備・放行上台"},
+];
+const ROLE_NAME={announcer:"🎙️ 播報",timer:"⏱️ 計時",marshal:"🧾 監卡",ref1:"🚦 裁判①",ref2:"🚦 裁判②",ref3:"🚦 裁判③",jury:"🧑‍⚖️ 審判",director:"🎬 情境台",equip:"👕 裝備控制",control:"🔧 技術管制",board:"📺 大螢幕",spect:"👀 觀眾"};
+
+// ---- 大廳 / 角色鎖定 ----
+let myName = localStorage.getItem("wlsim_nick") || "";
+let players = {};   // players/<role> = {name, uid}
+function setNick(){
+  const v=($("nick").value||"").trim();
+  if(!v){ flashPick("請先輸入暱稱"); return; }
+  myName=v; localStorage.setItem("wlsim_nick", v);
+  $("helloName").textContent=v;
+  $("nameStep").classList.add("hidden");
+  $("roleStep").classList.remove("hidden");
+  renderRoleGrid();   // 立即顯示角色按鈕（不等 Firebase）
+}
+if(myName){ $("nick") && ($("nick").value=myName); }
+function renderRoleGrid(){
+  const g=$("roleGrid"); if(!g) return;
+  g.innerHTML = ROLE_DEFS.map(r=>{
+    const p=players[r.id];
+    return `<button class="rolebtn${p?' taken':''}" onclick="claimRole('${r.id}')">
+      <span class="rn">${r.e} ${r.n}</span><span class="rd">${r.d}</span>
+      <span class="occ">${p?('👤 '+p.name):'— 空缺 —'}</span></button>`;
+  }).join("");
+}
+function flashPick(t){ const e=$("pickErr"); e.textContent=t; setTimeout(()=>{ if(e.textContent===t)e.textContent=""; },2500); }
+const JURY_PIN = "9898";   // 審判角色密碼
+function claimRole(r){
+  if(players[r]){ flashPick("這個角色已被 "+players[r].name+" 選走了"); return; }
+  if(r==="jury" && localStorage.getItem("wlsim_juryok")!==JURY_PIN){
+    const p = prompt("審判 Jury 為指定人員，請輸入密碼：");
+    if(p===null) return;
+    if(p!==JURY_PIN){ flashPick("密碼錯誤"); return; }
+    localStorage.setItem("wlsim_juryok", p);
+  }
+  flashPick("登記角色中…");
+  const ref=ROOM.child("players/"+r);
+  ref.transaction(cur => cur===null ? {name:myName, uid:myUid} : undefined,
+    (err, committed)=>{
+      if(err){ flashPick("連線失敗："+err.message); return; }
+      if(committed){ $("pickErr").textContent=""; ref.onDisconnect().remove(); join(r); }
+      else flashPick("手慢了！角色剛被選走");
+    });
+}
+// 大螢幕需要主持人密碼（同一台裝置輸入過一次就記住）
+const BOARD_PIN = "0711";
+function boardJoin(){
+  if(localStorage.getItem("wlsim_boardok")===BOARD_PIN){ join("board"); return; }
+  const p = prompt("大螢幕為主持人專用，請輸入密碼：");
+  if(p===BOARD_PIN){ localStorage.setItem("wlsim_boardok", p); join("board"); }
+  else if(p!==null) flashPick("密碼錯誤");
+}
+function leaveRole(){
+  if(role && players[role] && players[role].uid===myUid) ROOM.child("players/"+role).remove();
+  location.reload();
+}
+// 大廳即時顯示角色佔用（不等登入，先畫出按鈕再更新佔用狀態）
+renderRoleGrid();
+ROOM.child("players").on("value", s=>{ players=s.val()||{}; renderRoleGrid(); });
+
 // ---- 狀態 ----
 let role=null, state=null, clock=null, refs={r1:"",r2:"",r3:"",jury:""}, lift=null, ctl=null, eq=null;
+let flow="announce";
 
 function join(r){
-  role=r; $("roleTag").textContent = ROLE_NAME[r];
-  if(r==="board") document.body.classList.add("projector");
+  role=r; $("roleTag").textContent = (ROLE_NAME[r]||r)+(r==="board"||r==="spect"?"":" · "+myName);
+  if(r==="board"){ document.body.classList.add("projector"); $("stage").classList.remove("hidden");
+    $("sndBtn").classList.remove("hidden"); enableAudio(); }   // 點「大螢幕」的手勢即可解鎖音訊 → 直接預設開啟
   if(r==="marshal") document.body.classList.add("mrole");
-  $("pick").classList.add("hidden");
+  $("lobby").classList.add("hidden");
   $("app").classList.remove("hidden");
   if(r==="marshal") $("marshalCard").classList.remove("hidden");
   else $("boardCard").classList.remove("hidden");
   buildControls();
-  whenAuthed(() => {
+  {
     seedIfEmpty();
     ROOM.child("state").on("value", s => { state=s.val(); render(); });
     ROOM.child("clock").on("value", s => { clock=s.val()||{running:false,remain:60,dur:60}; });
@@ -293,11 +590,11 @@ function join(r){
     ROOM.child("lift").on("value", s => { lift=s.val()||{phase:"idle",desc:""}; render(); });
     ROOM.child("equip").on("value", s => { eq=s.val()||{desc:""}; render(); });
     ROOM.child("control").on("value", s => { ctl=s.val()||{hold:false}; render(); });
+    ROOM.child("flow").on("value", s => { flow=s.val()||"announce"; render(); });
     ROOM.child("log").on("value", s => renderLog(s.val()));
-  });
+  }
   setInterval(tickClock, 200);
 }
-const ROLE_NAME={announcer:"🎙️ 播報",timer:"⏱️ 計時",marshal:"🧾 監卡",ref1:"🚦 裁判①",ref2:"🚦 裁判②",ref3:"🚦 裁判③",jury:"🧑‍⚖️ 陪審",director:"🎬 情境台",equip:"👕 裝備控制",control:"🔧 技術管制",board:"📺 大螢幕"};
 
 // ---- 順序計算 ----
 function athArr(){ if(!state||!state.athletes) return [];
@@ -306,30 +603,40 @@ function pendingOf(a){
   for(let i=0;i<3;i++){ const x=a.att&&a.att[i]; if(x && (x.res===""||x.res==null) && x.w!=null) return {i, w:x.w, no:i+1}; }
   return null;
 }
+// 前一次試舉的重量（第 1 次試舉無前次 → 0，視為相同跳下一層比較）
+function prevWOf(a, i){ const x = i>0 && a.att && a.att[i-1]; return (x && x.w!=null) ? x.w : 0; }
+// 出場順序（TCRR）：重量小者先 → 試舉次數少者先 → 前次試舉重量小者先 → 籤號小者先
 function order(){
   return athArr().map(a=>({a,p:pendingOf(a)})).filter(x=>x.p)
-    .sort((x,y)=> x.p.w-y.p.w || x.p.no-y.p.no || x.a.lot-y.a.lot);
+    .sort((x,y)=> x.p.w-y.p.w
+      || x.p.no-y.p.no
+      || prevWOf(x.a,x.p.i)-prevWOf(y.a,y.p.i)
+      || x.a.lot-y.a.lot);
 }
 function current(){ const o=order(); return o.length?o[0]:null; }
-// 改成 nw 後，是否會排到「台上選手」之前（比目前上場者更前面）→ 違規
 function jumpsAheadOfCurrent(id, ai, lot, nw){
   const cur=current();
-  if(!cur || cur.a.id===id) return false;   // 沒人上場 或 就是自己 → 不限制
+  if(!cur || cur.a.id===id) return false;
   const no1=ai+1;
-  if(nw!==cur.p.w) return nw<cur.p.w;        // 比台上輕 → 違規
-  if(no1!==cur.p.no) return no1<cur.p.no;    // 同重量、試舉次數較少 → 排前面
-  return lot<cur.a.lot;                      // 同重量同次數、籤號較小 → 排前面
+  if(nw!==cur.p.w) return nw<cur.p.w;
+  if(no1!==cur.p.no) return no1<cur.p.no;
+  const a=athArr().find(x=>x.id===id);
+  const pw=a?prevWOf(a,ai):0, cpw=prevWOf(cur.a,cur.p.i);
+  if(pw!==cpw) return pw<cpw;
+  return lot<cur.a.lot;
 }
-
 // ---- 動作 ----
 function announce(){ const c=current(); if(!c){pushLog("ev","本組抓舉結束 🎉");return;}
-  if(ctl && ctl.hold){ flash(`技術管制未通過：${(eq&&eq.desc)||"裝備不合規"}，不得上台`); return; }   // 不合規 → 擋下叫號
+  if(ctl && ctl.hold){ flash(`技術管制未通過：${(eq&&eq.desc)||"裝備不合規"}，不得上台`); return; }
   const same=(c.a.id===(state.prevId||0));
-  pushLog("ev",`🎙️ 叫號：${c.a.name}　抓舉第 ${c.p.no} 次 · ${c.p.w} kg`+(same?"（同一選手連續，2:00）":""));
+  pushLog("ev",`🎙️ 叫號：${c.a.name}　抓舉第 ${c.p.no} 次 · ${c.p.w} kg`+(same?"（同一選手連續，2:00）":""),
+    (same?"進行連續試舉，":"") + `重量 ${c.p.w} 公斤，${c.a.lot} 號，${c.a.name}，第${["一","二","三"][c.p.no-1]}次試舉，請出場`,
+    `${c.p.w} kilograms, number ${c.a.lot}, ${EN_BY_ID[c.a.id]||c.a.name}, ${["first","second","third"][c.p.no-1]} attempt`);
   setCue(same ? "請計時裁判起鐘（同一選手連續 → 2:00）" : "請計時裁判起鐘（1:00）");
-  ROOM.child("state/bar").set(Math.max((state.bar)||0, c.p.w));   // 槓鈴上到此重量，只增不減
+  ROOM.child("state/bar").set(Math.max((state.bar)||0, c.p.w));
+  ROOM.child("flow").set("clock");
 }
-function record(){ // 播報依燈號記錄判定
+function record(){
   const c=current(); if(!c){return;}
   const g=[refs.r1,refs.r2,refs.r3].filter(x=>x==="good").length;
   const n=[refs.r1,refs.r2,refs.r3].filter(x=>x==="no").length;
@@ -337,20 +644,26 @@ function record(){ // 播報依燈號記錄判定
   let good = g>=2;
   let overridden=false;
   if(refs.jury==="good"){ good=true; overridden=true; } else if(refs.jury==="no"){ good=false; overridden=true; }
+  // === 寫入結果、換下一位 ===
   const id=c.a.id, i=c.p.i, w=c.p.w;
   const up={}; up[`state/athletes/${id}/att/${i}/res`]= good?"good":"fail";
   if(i+1<3){ const auto = good? w+1 : w; up[`state/athletes/${id}/att/${i+1}`]={w:auto, auto:auto, decls:[auto], res:""}; }
   up["state/prevId"]=id;
   ROOM.update(up);
   ROOM.child("refs").set({r1:"",r2:"",r3:"",jury:""});
-  ROOM.child("lift").set({phase:"idle",desc:""});
-  ROOM.child("equip").set({desc:""});                  // 換下一位 → 裝備重置
-  ROOM.child("control").set({hold:false});             // 換下一位 → 管制重置
+  ROOM.child("lift").set({phase:"idle",desc:"",correct:""});
+  ROOM.child("equip").set({desc:""});
+  ROOM.child("control").set({hold:false});
   ROOM.child("clock").set({running:false,dur:60,remain:60});
-  pushLog(good?"ok":"no",`${good?"⚪ 成功":"🔴 失敗"}　${c.a.name} 抓舉第 ${i+1} 次 ${w} kg`+(overridden?"（陪審覆議改判）":""));
+  ROOM.child("flow").set("announce");
+  pushLog(good?"ok":"no",`${good?"⚪ 成功":"🔴 失敗"}　${c.a.name} 抓舉第 ${i+1} 次 ${w} kg`+(overridden?"（審判覆議改判）":""));
 }
 function setRef(n,val){ ROOM.child("refs/"+n).set(val); }
-function setLift(phase,desc){ ROOM.child("lift").set({phase,desc}); if(desc) pushLog("ev","🎬 "+desc); }
+function setLift(phase,desc,correct){
+  ROOM.child("lift").set({phase,desc:desc||"",correct:correct||""});
+  if(desc && phase==="done") pushLog("ev","🎬 "+desc);
+  if(phase==="done") ROOM.child("flow").set("judge");
+}
 function setControl(hold){
   ROOM.child("control").set({hold:!!hold});
   pushLog("ev", hold ? `🔧 技術管制：不符合 → 不得上台，請選手修正` : "🔧 技術管制：合規，准許上台");
@@ -362,52 +675,48 @@ function setEquip(desc){
 function vpt(){ pushLog("ev","🎥 審判啟動影像回放（VPT）審視中…"); }
 function juryDecide(val){ ROOM.child("refs/jury").set(val);
   pushLog("ev", val? `🧑‍⚖️ 審判覆議：擬改判 ${val==="good"?"⚪ 成功":"🔴 失敗"}` : "🧑‍⚖️ 審判：維持原判"); }
-// 申報序列：[原始申報, 第1次改, 第2次改]
 function declsOf(x){
   if(x && x.decls){ const d=Array.isArray(x.decls)?x.decls:Object.values(x.decls); if(d.length) return d.slice(); }
   return [x.w];
 }
-// 試舉卡單格：a=選手, ai=試舉欄(0/1/2), rowKey=auto/decl/c1/c2
 function cardCell(a, ai, rowKey){
   const x=a.att&&a.att[ai];
-  if(!x) return `<td class="ac-empty">—</td>`;             // 還沒到的試舉
+  if(!x) return `<td class="ac-empty">—</td>`;
   const decls=declsOf(x), res=x.res, pending=(res===""||res==null), chg=decls.length-1;
-  const cur = pending && ((pendingOf(a)||{}).i===ai);      // 當前可操作的試舉
+  const cur = pending && ((pendingOf(a)||{}).i===ai);
   if(rowKey==="auto"){
-    if(ai===0) return `<td class="ac-empty">✕</td>`;        // 第1次無自動進位（過磅已申報）
+    if(ai===0) return `<td class="ac-empty">✕</td>`;
     return `<td class="ac-auto">${x.auto!=null?x.auto:"—"}</td>`;
   }
   if(rowKey==="decl"){
     const v=decls[0];
-    if(cur && ai>=1 && chg===0)                            // 2nd/3rd 的宣告確認（30秒內可改），尚未更改
+    if(cur && ai>=1 && chg===0)
       return `<td><input class="wedit" type="number" value="${v}" data-id="${a.id}" data-i="${ai}" onchange="declChange(this)"></td>`;
     let cls=""; if(!pending && decls.length===1) cls=res==="good"?"ac-good":"ac-fail"; else if(pending && decls.length===1) cls="ac-cur";
     return `<td class="${cls}">${v}</td>`;
   }
-  const ci = rowKey==="c1"?1:2;                            // 第1/2次更改
+  const ci = rowKey==="c1"?1:2;
   if(ci < decls.length){
     const v=decls[ci], last=(ci===decls.length-1);
     let cls=""; if(!pending && last) cls=res==="good"?"ac-good":"ac-fail"; else if(pending && last) cls="ac-cur";
     return `<td class="${cls}">${v}</td>`;
   }
-  if(cur && ci===decls.length && chg<2)                    // 下一個可填的更改格
+  if(cur && ci===decls.length && chg<2)
     return `<td><input class="wedit" type="number" placeholder="改" data-id="${a.id}" data-i="${ai}" onchange="inlineChange(this)"></td>`;
-  return `<td class="ac-empty">${pending?"—":"✕"}</td>`;   // 已完成試舉的更改格打叉
+  return `<td class="ac-empty">${pending?"—":"✕"}</td>`;
 }
-// 2nd/3rd 試舉的「宣告確認」（設定申報重量，尚未更改前可改）
 function declChange(el){
   const id=+el.dataset.id, ai=+el.dataset.i, nw=parseInt(el.value,10);
   const a=athArr().find(x=>x.id===id); const x=a&&a.att&&a.att[ai];
   if(!a||!x||!nw){ render(); return; }
   if(x.res!=="" && x.res!=null){ render(); return; }
   const decls=declsOf(x);
-  if(decls.length>1){ render(); return; }                 // 已更改過，宣告不可再改
+  if(decls.length>1){ render(); return; }
   if(jumpsAheadOfCurrent(id, ai, a.lot, nw)){ const cu=current(); flash(`不可排到台上 ${cu.a.name}（${cu.p.w}kg）之前`); render(); return; }
   decls[0]=nw;
   ROOM.child(`state/athletes/${id}/att/${ai}`).update({ w:nw, decls });
   pushLog("ev",`🧾 監卡：${a.name} 第 ${ai+1} 次試舉 宣告確認 ${nw} kg`);
 }
-// 監卡填入一次更改（附加到申報序列）
 function inlineChange(el){
   const id=+el.dataset.id, ai=+el.dataset.i, nw=parseInt(el.value,10);
   const a=athArr().find(x=>x.id===id); const x=a&&a.att&&a.att[ai];
@@ -422,15 +731,20 @@ function inlineChange(el){
   pushLog("ev",`🧾 監卡：${a.name} 第 ${ai+1} 次試舉 → 第 ${decls.length-1} 次更改 ${nw} kg`);
 }
 // 時鐘
-function startClock(sec){ ROOM.child("clock").set({running:true,dur:sec,startAt:firebase.database.ServerValue.TIMESTAMP}); }
-function stopClock(){ const r=remainNow(); ROOM.child("clock").set({running:false,dur:clock?clock.dur:60,remain:r}); }
+function startClock(sec){
+  if(flow==="clock") ROOM.child("flow").set("perform");
+  ROOM.child("clock").set({running:true,dur:sec,startAt:firebase.database.ServerValue.TIMESTAMP});
+}
+function stopClock(){
+  const r=remainNow(); ROOM.child("clock").set({running:false,dur:clock?clock.dur:60,remain:r});
+}
 function resetClockTo(){ ROOM.child("clock").set({running:false,dur:60,remain:60}); }
 function remainNow(){
   if(!clock) return 60;
   if(clock.running && clock.startAt!=null) return Math.max(0, clock.dur - Math.floor((now()-clock.startAt)/1000));
   return clock.remain!=null?clock.remain:clock.dur;
 }
-let lastShown=99, beeped={};
+let lastShown=99;
 function tickClock(){
   const r=remainNow(); const el=$("clock"); if(!el) return;
   el.textContent=Math.floor(r/60)+":"+String(r%60).padStart(2,"0");
@@ -442,20 +756,137 @@ function tickClock(){
   }
   lastShown=r;
 }
-// 嗶聲
-let ac=null; function beep(f,d){ try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();
-  const o=ac.createOscillator(),g=ac.createGain();o.type="square";o.frequency.value=f;g.gain.value=.13;
-  o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d);}catch(e){} }
+
+// ---- 音效 / 語音（大螢幕）----
+let ac=null, audioOn=false;
+function tone(f,d,type,gain){ try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();
+  const o=ac.createOscillator(),g=ac.createGain();o.type=type||"square";o.frequency.value=f;
+  g.gain.value=gain!=null?gain:.13;o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d);}catch(e){} }
+function beep(f,d){ tone(f,d); }
+function chime(){ if(!audioOn)return; tone(880,.14,"triangle",.18); setTimeout(()=>tone(1175,.22,"triangle",.18),140); }
+function downBuzz(){ if(!audioOn)return; tone(220,.55,"sawtooth",.2); }
+function fanfare(){ if(!audioOn)return; [523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,.2,"triangle",.16),i*120)); }
+function failBuzz(){ if(!audioOn)return; tone(150,.5,"sawtooth",.18); setTimeout(()=>tone(110,.5,"sawtooth",.16),180); }
+// 語音：語言模式（中文/English/中英）+ 聲音選擇
+let myVoice=null, enVoice=null, langMode=localStorage.getItem("wlsim_lang")||"zh";
+function loadVoices(){
+  if(!window.speechSynthesis) return;
+  const all=speechSynthesis.getVoices();
+  // 一律用 Google 聲音（Chrome 才有）；找不到才退回系統聲音
+  const zh=all.filter(v=>/^zh/i.test(v.lang) && !/yue|HK|粵/i.test(v.lang+v.name));
+  myVoice = zh.find(v=>/Google/.test(v.name)) || zh.find(v=>/TW/i.test(v.lang)) || zh[0] || null;
+  enVoice = all.find(v=>/Google US English/.test(v.name)) ||
+            all.find(v=>/Google/.test(v.name) && /^en/i.test(v.lang)) ||
+            all.find(v=>/^en/i.test(v.lang)) || null;
+}
+if(window.speechSynthesis){ loadVoices(); speechSynthesis.onvoiceschanged=loadVoices; }
+function pickLang(m){
+  langMode=m; localStorage.setItem("wlsim_lang", m);
+  speakLine("語音改為中文","Voice set to English");
+}
+function say(t){ if(!audioOn || !window.speechSynthesis || !t) return;
+  const u=new SpeechSynthesisUtterance(t); u.lang="zh-TW"; u.rate=1.05;
+  if(myVoice) u.voice=myVoice;
+  speechSynthesis.speak(u); }
+function sayEn(t){ if(!audioOn || !window.speechSynthesis || !t) return;
+  const u=new SpeechSynthesisUtterance(t); u.lang="en-US"; u.rate=1.0;
+  if(enVoice) u.voice=enVoice;
+  speechSynthesis.speak(u); }
+// 依語言模式播報（zh=只中文、en=只英文、both=先中後英）
+function speakLine(zh,en){
+  if(langMode==="en"){ if(en) sayEn(en); else say(zh); }
+  else if(langMode==="both"){ say(zh); if(en) sayEn(en); }
+  else say(zh);
+}
+function enableAudio(){
+  audioOn=true; tone(880,.1,"triangle",.12);
+  loadVoices();
+  const ls=$("langSel"); ls.classList.remove("hidden"); ls.value=langMode;
+  $("sndBtn").textContent="🔊 音效開";
+}
+function toggleAudio(){
+  if(audioOn){ audioOn=false; $("sndBtn").textContent="🔇 音效關"; if(window.speechSynthesis) speechSynthesis.cancel(); }
+  else enableAudio();
+}
+const stripEmoji = s => s.replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/gu,"").trim();
 
 // ---- 紀錄 ----
-function pushLog(cls,msg){ ROOM.child("log").push({cls,msg,t:firebase.database.ServerValue.TIMESTAMP}); }
+function pushLog(cls,msg,sayTxt,sayEnTxt){ ROOM.child("log").push({cls,msg,say:sayTxt||null,sayEn:sayEnTxt||null,t:firebase.database.ServerValue.TIMESTAMP}); }
+let logCount=-1;   // -1 = 尚未初始化（首次載入不播音效）
 function renderLog(v){
   const arr=v?Object.values(v).sort((a,b)=>(a.t||0)-(b.t||0)):[];
+  // 大螢幕音效/語音：只對「新增」的紀錄反應
+  if(role==="board" && logCount>=0 && arr.length>logCount){
+    arr.slice(logCount).forEach(x=>{
+      const m=x.msg||"";
+      if(m.indexOf("🎙️ 叫號")>=0){ chime(); speakLine(x.say, x.sayEn); }
+      else if(x.cls==="ok"){ speakLine("成功","Good lift"); fanfare(); confettiBurst(); }
+      else if(x.cls==="no"){ speakLine("失敗","No lift"); failBuzz(); stageDrop(); }
+    });
+  }
+  logCount=arr.length;
   const d=$("log"); if(d){ d.innerHTML=arr.map(x=>`<div class="${x.cls||''}">${x.msg}</div>`).join(""); d.scrollTop=d.scrollHeight; }
   const m=$("mLog"); if(m){ const ch=arr.filter(x=>(x.msg||"").indexOf("監卡")>=0);
     m.innerHTML = ch.length? ch.map(x=>`<div class="ev">${x.msg}</div>`).join("") : '<div class="ord">尚無換把紀錄</div>'; m.scrollTop=m.scrollHeight; } }
 function setCue(t){ $("cue").textContent=t||""; }
 function flash(t){ setCue(t); setTimeout(()=>{ if($("cue").textContent===t) setCue(""); },2000); }
+// ---- 舞台特效（大螢幕）----
+function confettiBurst(){
+  const c=$("confetti"); if(!c || role!=="board") return;
+  let h=""; for(let i=0;i<70;i++){
+    h+=`<span style="left:${Math.random()*100}%;background:hsl(${(Math.random()*360)|0},90%,62%);`+
+       `animation-delay:${(Math.random()*0.6).toFixed(2)}s;animation-duration:${(2+Math.random()*1.5).toFixed(2)}s"></span>`;
+  }
+  c.innerHTML=h; setTimeout(()=>{ c.innerHTML=""; },3600);
+}
+function stageDrop(){
+  const st=$("stage"); if(!st || role!=="board") return;
+  st.classList.add("drop","flashbad");
+  setTimeout(()=>st.classList.remove("drop","flashbad"),900);
+}
+
+// ---- 任務提示卡 ----
+function isDecided(){
+  const g=[refs.r1,refs.r2,refs.r3].filter(x=>x==="good").length;
+  const n=[refs.r1,refs.r2,refs.r3].filter(x=>x==="no").length;
+  return g>=2||n>=2;
+}
+function taskFor(){
+  const ph=lift?lift.phase:"idle", dec=isDecided();
+  switch(role){
+    case "announcer":
+      if(dec) return {t:"🎯 輪到你：按「記錄判定」套用燈號結果、換下一位", hot:true};
+      if(flow==="announce") return {t:"🎯 輪到你：叫號下一位選手", hot:true};
+      return {t:"⏳ 等待中：選手試舉、裁判判定後再記錄"};
+    case "timer":
+      if(ph==="lifting" && clock && clock.running) return {t:"🎯 槓鈴離地——立刻停錶！", hot:true};
+      if(flow==="clock") return {t:"🎯 輪到你：起鐘！同一選手連續 → 2:00，否則 1:00", hot:true};
+      return {t:"⏳ 等待叫號後起鐘；槓鈴離地時停錶"};
+    case "director":
+      if(flow==="perform" && ph==="idle") return {t:"🎯 輪到你：扮演選手 → 按「預備」上場", hot:true};
+      if(ph==="ready") return {t:"🎯 繼續：按「槓鈴離地」", hot:true};
+      if(ph==="lifting") return {t:"🎯 繼續：選一個「完成動作」情境給裁判判讀", hot:true};
+      return {t:"⏳ 等待計時起鐘後扮演選手動作"};
+    case "ref1": case "ref2": case "ref3": {
+      const my=refs["r"+role.slice(3)];
+      if(ph==="done" && !my) return {t:"🎯 輪到你：看大螢幕動作描述 → 判定成功/失敗", hot:true};
+      if(my) return {t:"✅ 已送出判定，等其他裁判（3 秒內可改判）"};
+      return {t:"⏳ 等待選手完成動作後判定"};
+    }
+    case "jury":
+      if(dec) return {t:"🎯 檢視判定：必要時啟動 VPT、覆議改判", hot:true};
+      return {t:"⏳ 監看比賽；裁判燈號出來後可覆議"};
+    case "marshal":
+      return {t:"📝 隨時受理教練換把（每次試舉最多 2 次更改）"};
+    case "equip":
+      if(flow==="announce"||flow==="clock") return {t:"🎯 可設定目前選手的裝備情境（合規或挑一個違規）", hot:flow==="announce"};
+      return {t:"⏳ 等下一位選手再設定裝備情境"};
+    case "control":
+      if(eq && eq.desc) return {t:"🎯 輪到你：看「👕 裝備檢查」內容 → 判定可否上台", hot:true};
+      return {t:"⏳ 等裝備控制呈現選手裝備後判定"};
+  }
+  return null;
+}
 
 // ---- 控制面板（依角色）----
 function buildControls(){
@@ -467,7 +898,7 @@ function buildControls(){
     <button class="b-blue" onclick="startClock(120)">▶ 2:00</button>
     <button onclick="stopClock()">⏸ 停</button><button onclick="resetClockTo()">↺ 歸零</button></div>
     <p class="sub" style="margin-top:8px">同一選手連續上場給 2:00；其餘 1:00。倒數 30 秒做最後召喚。</p>`;
-  else if(role==="marshal") h=`<p class="sub">受理教練換把：直接在下方「換把管理」表格修改各選手的待舉重量（每次試舉最多 2 次更改）。改完出場順序會自動重排。</p>`;
+  else if(role==="marshal") h=`<p class="sub">受理教練換把：直接在下方試舉卡修改各選手的待舉重量（每次試舉最多 2 次更改）。改完出場順序會自動重排。</p>`;
   else if(role==="ref1"||role==="ref2"||role==="ref3"){ const n="r"+role.slice(3);
     h=`<div class="btns"><button class="b-good" onclick="setRef('${n}','good')">⚪ 成功 Good lift</button>
     <button class="b-bad" onclick="setRef('${n}','no')">🔴 失敗 No-lift</button></div>
@@ -481,7 +912,7 @@ function buildControls(){
     <p class="sub" style="margin-top:8px">審判多數可推翻裁判判定；設定後由播報「記錄判定」套用。</p>`;
   else if(role==="director"){
     const opts = LIFT_SCENARIOS.map((s,i)=>
-      `<button class="${i===0?'b-good':'b-ghost'}" onclick="setLift('done', LIFT_SCENARIOS[${i}].desc)">${s.label}</button>`).join("");
+      `<button class="${i===0?'b-good':'b-ghost'}" onclick="setLift('done', LIFT_SCENARIOS[${i}].desc, LIFT_SCENARIOS[${i}].correct)">${s.label}</button>`).join("");
     h=`<div class="btns">
         <button class="b-blue" onclick="setLift('ready','選手上場、預備動作')">🧍 預備</button>
         <button class="b-bad" onclick="setLift('lifting','槓鈴離地')">🏋️ 槓鈴離地</button></div>
@@ -504,8 +935,45 @@ function buildControls(){
         <button class="b-bad" onclick="setControl(true)">⛔ 不符合 · 不能上台</button></div>
       <p class="sub" style="margin-top:8px">判「不符合」後，播報無法叫號該選手，直到裝備修正、改判合規。</p>`;
   }
-  else h=`<button class="b-ghost" style="font-size:.78rem; padding:7px 12px" onclick="if(confirm('重置整組比賽？'))resetMatch()">↺ 重置整組</button>`;
+  else if(role==="board") h=`<button class="b-ghost" style="font-size:.78rem; padding:7px 12px" onclick="if(confirm('重置整組比賽（含積分）？'))resetMatch()">↺ 重置整組（含積分）</button>`;
+  else h=``;   // 觀眾
   c.innerHTML=h;
+}
+
+// ---- 結算 ----
+let resultShown=false;
+// 抓舉排名：最佳成功重量高者在前（無成功試舉 = 無成績）
+function snatchRanking(){
+  return athArr().map(a=>{
+    let best=0; for(let i=0;i<3;i++){ const x=a.att&&a.att[i]; if(x && x.res==="good" && x.w>best) best=x.w; }
+    return {...a, best};
+  }).sort((x,y)=> (y.best-x.best) || (x.lot-y.lot));
+}
+function showResult(){
+  const arr=snatchRanking();
+  const ranked=arr.filter(a=>a.best>0), out=arr.filter(a=>!a.best);
+  const top=[ranked[1],ranked[0],ranked[2]];   // 銀/金/銅 排列
+  const cls=["s","g","b"], med=["🥈","🥇","🥉"];
+  $("podium").innerHTML = top.map((a,i)=> a?
+    `<div class="pod ${cls[i]}"><div class="med">${med[i]}</div>
+      <img src="${AV_BY_ID[a.id]||''}" style="width:64px;height:64px;border-radius:18%;object-fit:cover">
+      <div class="pname">${a.name}</div><div class="prole">#${a.lot}</div>
+      <div class="ppts">${a.best} kg</div></div>` : "").join("");
+  $("finalRanks").innerHTML =
+    ranked.map((a,i)=>`<div class="row"><span class="pos">${["🥇","🥈","🥉"][i]||(i+1)}</span>
+      <span class="pn">${a.name} <span class="pr">#${a.lot}</span></span><span class="pp">${a.best} kg</span></div>`).join("")
+    + out.map(a=>`<div class="row"><span class="pos">—</span>
+      <span class="pn">${a.name} <span class="pr">#${a.lot}</span></span><span class="pp">無成績</span></div>`).join("");
+  $("resultOv").classList.remove("hidden");
+  if(role==="board"){
+    fanfare(); confettiBurst();
+    let zh="抓舉比賽結束。", en="The snatch competition is over. ";
+    ranked.forEach((a,i)=>{
+      zh+=`第${["一","二","三"][i]||(i+1)}名，${a.lot} 號，${a.name}，成績 ${a.best} 公斤。`;
+      en+=`${["First","Second","Third"][i]||("No. "+(i+1))} place, ${EN_BY_ID[a.id]||a.name}, ${a.best} kilograms. `;
+    });
+    speakLine(zh,en);
+  }
 }
 
 // ---- 渲染 ----
@@ -515,45 +983,64 @@ function render(){
   $("curAtt").textContent  = c? `抓舉 · 第 ${c.p.no} 次試舉` : "本組結束 🎉";
   $("curWt").textContent   = c? `${c.p.w} kg` : "";
   const av=$("curAv"); if(c){ av.src=AV_BY_ID[c.a.id]||""; av.style.visibility="visible"; } else { av.style.visibility="hidden"; }
-  // 動作階段（投影/大螢幕都看得到）
-  const lp=$("liftPhase"); const ph=lift?lift.phase:"idle";
-  if(role!=="board" || !ph || ph==="idle"){ lp.style.display="none"; }  // 只在大螢幕顯示動作描述
+  const ph=lift?lift.phase:"idle";
+  // 🎭 舞台（大螢幕）
+  if(role==="board"){
+    const st=$("stage");
+    st.className="stage "+(ph==="ready"?"phase-ready":ph==="lifting"?"phase-lifting":ph==="done"?"phase-done":"phase-idle");
+    $("stName").innerHTML = c? `${c.a.name} — 抓舉第 ${c.p.no} 次 <b>${c.p.w} kg</b>` : "🎉 本組比賽結束";
+    const svg=$("lifterSvg");
+    if(c){ svg.style.visibility="visible";
+      const src="#face"+(c.a.id||1);   // 依選手切換 SVG 畫的臉
+      document.querySelectorAll(".stFace").forEach(im=>{ if(im.getAttribute("href")!==src) im.setAttribute("href",src); });
+    } else svg.style.visibility="hidden";
+    const sd=$("stDesc");
+    if(ph==="done" && lift.desc){ sd.classList.remove("hidden"); sd.textContent="🎬 "+lift.desc; }
+    else sd.classList.add("hidden");
+  }
+  // 任務提示卡
+  const tk=$("taskCard"), task=taskFor();
+  if(task){ tk.classList.remove("hidden"); tk.className="task"+(task.hot?" hot":""); tk.textContent=task.t; }
+  else tk.classList.add("hidden");
+  // 動作階段（只在大螢幕顯示描述）
+  const lp=$("liftPhase");
+  if(role!=="board" || !ph || ph==="idle"){ lp.style.display="none"; }
   else { lp.style.display="block";
     if(ph==="ready"){ lp.className="liftphase ready"; lp.textContent="🧍 預備動作："+(lift.desc||""); }
     else if(ph==="lifting"){ lp.className="liftphase lifting"; lp.textContent="🏋️ 槓鈴離地 — 計時裁判請停錶！"; }
     else { lp.className="liftphase done"; lp.textContent="完成動作："+(lift.desc||"")+"　→ 請裁判判定"; }
   }
-  // 裝備檢查頁（裝備控制呈現 → 投到大螢幕；技術管制也看得到）
+  // 裝備檢查
   const em=$("equipMsg");
   if(em){ const d=eq&&eq.desc; const show=d && (role==="board"||role==="control");
     if(show){ em.classList.remove("hidden"); const ok=(d==="裝備合規");
       em.className="equip"+(ok?"":" bad"); em.textContent=(ok?"👕 裝備檢查：✅ ":"👕 裝備檢查：⚠️ ")+d; }
     else em.classList.add("hidden"); }
-  // 技術管制警示（不符合 → 不得上台，全裝置都看得到）
+  // 技術管制警示
   const cm=$("controlMsg");
   if(cm){ if(ctl && ctl.hold){ cm.classList.remove("hidden"); cm.textContent="🔧 技術管制：不得上台 — "+((eq&&eq.desc)||"裝備不合規")+"（請選手修正）"; }
     else cm.classList.add("hidden"); }
-  // 燈號：三位都判定才顯示
+  // 燈號
   const votes=[refs.r1,refs.r2,refs.r3];
   const g=votes.filter(x=>x==="good").length, n=votes.filter(x=>x==="no").length;
-  const done=g+n, decided=(g>=2||n>=2);   // 2 燈同號即觸發放下
+  const done=g+n, decided=(g>=2||n>=2);
   const lt=$("lights");
   $("down").classList.toggle("hidden", !decided);
   if(decided){
-    lt.innerHTML=votes.map(v=>`<div class="lt ${v}"></div>`).join("");
+    lt.innerHTML=votes.map(v=>`<div class="lt pop ${v}"></div>`).join("");
     const good=g>=2;
     let txt = good?"判定：⚪ 成功":"判定：🔴 No-lift";
-    if(refs.jury==="good") txt="🧑‍⚖️ 陪審改判：⚪ 成功";
-    else if(refs.jury==="no") txt="🧑‍⚖️ 陪審改判：🔴 No-lift";
+    if(refs.jury==="good") txt="🧑‍⚖️ 審判改判：⚪ 成功";
+    else if(refs.jury==="no") txt="🧑‍⚖️ 審判改判：🔴 No-lift";
     setCue(txt);
-    if(!lastDecided && role==="board") beep(700,.25);
+    if(!lastDecided && role==="board"){ downBuzz(); speakLine("放下","Down"); }
   } else {
     lt.innerHTML=`<div class="ord" style="align-self:center">裁判已判定 ${done}/3（需 2 燈相同）</div>`;
   }
   lastDecided=decided;
   if(role&&role.startsWith("ref")){ const my=refs["r"+role.slice(3)]; const el=$("myVote");
     if(el) el.textContent="你的判定："+(my==="good"?"⚪ 成功":my==="no"?"🔴 失敗":"尚未送出"); }
-  // 監卡：每位選手一張試舉卡
+  // 監卡試舉卡
   if(role==="marshal"){ const mc=$("mCards"); if(mc){
     mc.innerHTML=athArr().sort((a,b)=>a.lot-b.lot).map(a=>{
       const p=pendingOf(a); const atName = p? `第 ${p.no} 次試舉` : "已完成";
@@ -572,20 +1059,23 @@ function render(){
   } }
   // 順序板
   const ord=order(), rank=new Map(ord.map((x,i)=>[x.a.id,i+1])), cid=c?c.a.id:-1;
-  // 整個板照「出場順序」排列：待舉者依叫號順序在上，已完成者在下
   const rows=[...ord.map(x=>x.a), ...athArr().filter(a=>!pendingOf(a)).sort((a,b)=>a.lot-b.lot)];
   $("board").innerHTML=rows.map(a=>{
     const cells=[0,1,2].map(i=>{ const x=a.att&&a.att[i];
       if(!x||x.w==null) return `<span class="cell" style="opacity:.35">—</span>`;
       if(x.res==="good") return `<span class="cell good">${x.w}</span>`;
       if(x.res==="fail") return `<span class="cell fail">${x.w}</span>`;
-      const liftingNow = (c && a.id===c.a.id && i===c.p.i);   // 正在台上舉的那一格 → 閃爍
+      const liftingNow = (c && a.id===c.a.id && i===c.p.i);
       return `<span class="cell pend${liftingNow?' lifting':''}">${x.w}</span>`; });
     const r=rank.get(a.id);
     return `<tr class="${a.id===cid?'cur':''}"><td>${r?`<span class="ord">${r}</span>`:"✓"}</td>`+
       `<td class="nm"><img class="bav" src="${AV_BY_ID[a.id]||''}">${a.name} <span class="ord">#${a.lot}</span></td>`+
       `<td>${cells[0]}</td><td>${cells[1]}</td><td>${cells[2]}</td></tr>`;
   }).join("");
+  // 🏁 賽後結算（9 次試舉全部完成）
+  if(state && athArr().length && !c){
+    if(!resultShown){ resultShown=true; showResult(); }
+  } else if(c){ resultShown=false; $("resultOv").classList.add("hidden"); }
 }
 </script>
 </body>
